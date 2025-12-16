@@ -10,4 +10,4 @@ def register_new_courier():
     }
 
     response = requests.post(const.BASE_URL+const.COURIER_HANDLE, data=payload)
-    return response
+    return response, payload["login"], payload["password"]
