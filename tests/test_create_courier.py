@@ -9,11 +9,9 @@ class TestCreateCourier:
     @allure.title('Проверка создания курьера')
     def test_create_courier(self, delete_courier):
         with allure.step("Создание нового курьера через register_new_courier"):
-            response, login, password = create_courier.register_new_courier()
+            response, login, password = create_courier.register_new_courier(delete_courier)
         with allure.step("Проверка статус кода ответа и тела ответа"):
             assert response.status_code == 201 and response.text == '{"ok":true}'
-        with allure.step("Удаление тестовых данных"):
-            delete_courier(login, password)
 
     @allure.title('Проверка, что нельзя создать двух одинаковых курьеров')
     def test_same_courier(self, delete_courier):
@@ -23,12 +21,14 @@ class TestCreateCourier:
             "password": data.password_registered,
             "firstName": data.first_name_registered,
         }
-        with allure.step("Отправка запроса на создание курьера"):
-         response = requests.post(const.BASE_URL + const.COURIER_HANDLE, data=payload)
-        with allure.step("Отправка запроса на создание курьера с существующими данными"):
-         response = requests.post(const.BASE_URL + const.COURIER_HANDLE, data=payload)
+        with allure.step("Первое создание курьера"):
+         response1 = requests.post(const.BASE_URL + const.COURIER_HANDLE, data=payload)
+         if response1.status_code == 201:
+                delete_courier.append((payload["login"], payload["password"]))
+        with allure.step("Второе создание курьера с теми же данными"):
+         response2 = requests.post(const.BASE_URL + const.COURIER_HANDLE, data=payload)
         with allure.step("Проверка статус кода ответа"): 
-          assert response.status_code == 409
+          assert response2.status_code == 409
 
 
     @allure.title('Проверка, что если одного из полей нет, запрос возвращает ошибку')
@@ -47,5 +47,5 @@ class TestCreateCourier:
             response = requests.post(const.BASE_URL + const.COURIER_HANDLE, data=payload)
         with allure.step("Проверка статус кода ответа"): 
             assert response.status_code == 400
-        with allure.step("Удаление тестовых данных"):
-            delete_courier(payload['login'], payload['password'])
+            if response.status_code == 201 and login and password:
+                delete_courier.append((login, password))

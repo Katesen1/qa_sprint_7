@@ -2,7 +2,7 @@ from extra import const
 from extra import data
 import requests
 
-def register_new_courier():
+def register_new_courier(delete_courier_list):
     payload = {
         "login": data.login_random,
         "password": data.password_random,
@@ -10,4 +10,5 @@ def register_new_courier():
     }
 
     response = requests.post(const.BASE_URL+const.COURIER_HANDLE, data=payload)
+    delete_courier_list.append((payload["login"], payload["password"]))
     return response, payload["login"], payload["password"]
