@@ -1,11 +1,11 @@
 import pytest
+import requests
+from extra import const
 
 @pytest.fixture
 def delete_courier():
     courier_data = []
     yield courier_data 
-    import requests
-    from extra import const
     for login, password in courier_data:
         try:
             login_response = requests.post(

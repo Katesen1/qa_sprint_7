@@ -11,8 +11,7 @@ class TestOrder:
     def test_create_order(self, color_variant):
         with allure.step("Подготовка данных"):
             payload = data.COMMON_ORDER_DATA
-            if color_variant is not None:
-                payload["color"] = color_variant
+            payload["color"] = color_variant
         with allure.step("Отправка запроса"):
             response = requests.post(const.BASE_URL + const.ORDERS_HANDLE, json=payload)
         with allure.step("Проверка статуса кода и наличие track в содержании ответа"):
